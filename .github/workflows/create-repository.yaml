@@ -18,36 +18,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Mostrar información
         run: |
           echo "Repositorio solicitado: ${{ inputs.repository_name }}"
           echo "Port Run ID: ${{ inputs.port_run_id }}"
 
       - name: Actualizar estado en Port
-        env:
-          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
-          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
-          PORT_RUN_ID: ${{ inputs.port_run_id }}
-        run: |
-          echo "Obteniendo token de Port..."
-
-          TOKEN=$(curl -s -X POST \
-            "https://api.port.io/v1/auth/access_token" \
-            -H "Content-Type: application/json" \
-            -d "{\"clientId\":\"$PORT_CLIENT_ID\",\"clientSecret\":\"$PORT_CLIENT_SECRET\"}" \
-            | jq -r '.accessToken')
-
-          echo "Actualizando ejecución $PORT_RUN_ID..."
-
-          RESPONSE=$(curl -s -X PATCH \
-            "https://api.port.io/v1/actions/runs/$PORT_RUN_ID" \
-            -H "Authorization: Bearer $TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "status": "SUCCESS",
-              "message": "Workflow ejecutado correctamente en GitHub"
-            }')
-
-          echo "Respuesta de Port:"
-          echo "$RESPONSE"
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          baseUrl: https://api.port.io
+          operation: PATCH_RUN
+          runId: ${{ inputs.port_run_id }}
+          status: SUCCESS
+          logMessage: "Workflow ejecutado correctamente en GitHub"
