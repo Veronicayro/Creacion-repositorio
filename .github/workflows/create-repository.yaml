@@ -8,11 +8,17 @@ on:
         required: true
         type: string
 
+      port_run_id:
+        description: "ID de la ejecución de Port"
+        required: true
+        type: string
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Mostrar nombre
+      - name: Mostrar información
         run: |
           echo "Repositorio solicitado: ${{ inputs.repository_name }}"
+          echo "Port Run ID: ${{ inputs.port_run_id }}"
