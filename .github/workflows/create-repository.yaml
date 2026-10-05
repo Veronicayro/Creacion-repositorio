@@ -23,6 +23,16 @@ jobs:
           echo "Repositorio solicitado: ${{ inputs.repository_name }}"
           echo "Port Run ID: ${{ inputs.port_run_id }}"
 
+      - name: Validar credenciales de Port
+        env:
+          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
+          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
+        run: |
+          if [ -z "$PORT_CLIENT_ID" ] || [ -z "$PORT_CLIENT_SECRET" ]; then
+            echo "::error::Faltan credenciales de Port. Configura los secretos PORT_CLIENT_ID y PORT_CLIENT_SECRET en GitHub antes de ejecutar este workflow."
+            exit 1
+          fi
+
       - name: Actualizar estado en Port
         uses: port-labs/port-github-action@v1
         with:
